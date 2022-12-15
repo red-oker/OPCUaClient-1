@@ -427,6 +427,32 @@ namespace OPCUaClient
             subscription.Create();
             subscription.ApplyChanges();
         }
+        
+        public ushort namespaceIndex = 3;
+
+        List<MonitoredItem> itemsMulti;
+        public void MonitoringMultiInit()
+        {
+            itemsMulti = new List<MonitoredItem>();        
+        }
+        
+        public void MonitoringMulti(string address, MonitoredItemNotificationEventHandler monitor)
+        {
+            MonitoredItem monitored = new MonitoredItem();
+            monitored.StartNodeId = new NodeId(address, namespaceIndex);
+            monitored.AttributeId = Attributes.Value;
+            monitored.Notification += monitor;
+            itemsMulti.Add(monitored);
+        }
+
+        public void MonitoringMultiExec(int miliseconds)
+        {
+            var subscription = this.Subscription(miliseconds);
+            subscription.AddItems(itemsMulti);
+            this.Session.AddSubscription(subscription);
+            subscription.Create();
+            subscription.ApplyChanges();
+        }
 
 
         /// <summary>
